@@ -1,0 +1,148 @@
+<script src="https://cdn.socket.io/4.5.3/socket.io.min.js" integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi" crossorigin="anonymous"></script>
+<script>
+    const socket = io.connect();
+
+    // Tabla con los productos
+    socket.on('products', (lista) => {
+        
+        const div = document.getElementById('productos');
+        
+        // Si no hay productos muestra "No hay productos"
+        if (lista.length > 0) {
+            div.innerHTML =
+            `
+                <table id="tablaProductos" class="table table-light">
+                    <thead>
+                      <tr class="align-self-center">
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Foto</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaProductos" class="table-group-divider">
+
+                    </tbody>
+                </table>
+            `;
+            const body = document.getElementById("tablaProductos");
+            
+            lista.forEach((producto) => {
+                body.innerHTML +=
+                `
+                    <tr>
+                        <td>${producto.title}</td>
+                        <td>$ ${producto.price}</td>
+                        <td><img width="50px" src= ${producto.thumbnail} alt= ${producto.title}></td>
+                    </tr>
+                `;
+            });
+            
+        } else {
+            `<H3 class="text-center p-5">No hay productos</H3>`
+        }; 
+        
+        const form = document.getElementById('form');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            // Recuperación de los datos ingresados en el formulario
+            const title = document.getElementById('title').value;
+            const price = document.getElementById('price').value;
+            const thumbnail = document.getElementById('thumbnail').value;
+
+            const newProduct = {title, price, thumbnail};
+            
+            // Borrado de datos en el fomulario de producto
+            document.getElementById('title').value = "";
+            document.getElementById('price').value = "";
+            document.getElementById('thumbnail').value = "";
+
+            socket.emit('newProduct', newProduct)
+        })
+    });
+
+    socket.on('newProducts',(lista) => {
+        const div = document.getElementById('productos');
+        
+        // Si no hay productos muestra "No hay productos"
+        if (lista.length > 0) {
+            div.innerHTML =
+            `
+                <table id="tablaProductos" class="table table-light">
+                    <thead>
+                      <tr class="align-self-center">
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Foto</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaProductos" class="table-group-divider">
+
+                    </tbody>
+                </table>
+            `;
+            const body = document.getElementById("tablaProductos");
+            
+            lista.forEach((producto) => {
+                body.innerHTML +=
+                `
+                    <tr>
+                        <td>${producto.title}</td>
+                        <td>$ ${producto.price}</td>
+                        <td><img width="50px" src= ${producto.thumbnail} alt= ${producto.title}></td>
+                    </tr>
+                `;
+            });
+            
+        } else {
+            `<H3 class="text-center p-5">No hay productos</H3>`
+        }; 
+    });
+
+    // Chat con mensajes previos
+    socket.on('conversation', (messages) => {
+
+        const messagesHtml = messages.map ((message) => `
+            <div>
+                <strong class="text-primary">${message.author}</strong> <span class="text-danger">[${message.fecha}]: </span> <i class="text-success"> ${message.text} </i>
+            <div>
+            `).join(' ');
+
+        document.getElementById('messages').innerHTML = messagesHtml;
+        
+        const chat = document.getElementById('chat');
+        
+        chat.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const text = document.getElementById('message').value;
+            const author = document.getElementById('email').value;
+            
+            // Si mail está vacio muestra alerta
+            if(author ===""){
+                alert("Falta completar el email");
+            }else{
+                const date = new Date();
+                const fecha = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            
+                message = {author, text, fecha};
+
+                // Borrado de datos en el fomulario de chat
+                document.getElementById('message').value = "";
+        
+                socket.emit('new-message',message);
+            }
+        });
+    });
+    
+    socket.on('newConversation',(messages) =>{
+
+        const messagesHtml = messages.map ((message) => `
+            <div>
+                <strong class="text-primary">${message.author}</strong> <span class="text-danger">[${message.fecha}]: </span> <i class="text-success"> ${message.text} </i>
+            <div>
+            `).join(' ');
+
+        document.getElementById('messages').innerHTML = messagesHtml;
+    });
+
+</script>
