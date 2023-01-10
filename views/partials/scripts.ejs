@@ -1,4 +1,5 @@
 <script src="https://cdn.socket.io/4.5.3/socket.io.min.js" integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.min.js"></script>
 <script>
     const socket = io.connect();
 
@@ -11,7 +12,7 @@
         if (lista.length > 0) {
             div.innerHTML =
             `
-                <table id="tablaProductos" class="table table-light">
+                <table id="tablaProductos" class="table table-light text-center">
                     <thead>
                       <tr class="align-self-center">
                         <th scope="col">Nombre</th>
@@ -99,13 +100,30 @@
         }; 
     });
 
+/*     // *** NORMALIZR
+    const { normalize, denormalize, schema } = require ('normalizr');
+
+   const authorSchema = new schema.Entity("autor", {}, {idAttribute:'mail'});
+
+   const mensajeSchema = new schema.Entity("mensaje", {
+       author: authorSchema,
+   });
+
+   const messagesSchema = new schema.Entity("messages", {
+       mensajes: [mensajeSchema]
+   }); */
+   
     // Chat con mensajes previos
     socket.on('conversation', (messages) => {
 
+
         const messagesHtml = messages.map ((message) => `
             <div>
-                <strong class="text-primary">${message.author}</strong> <span class="text-danger">[${message.fecha}]: </span> <i class="text-success"> ${message.text} </i>
-            <div>
+                <img width="50px" src=${message.author.avatar} alt=${message.author.alias}>
+                <strong class="text-primary">${message.author.mail}</strong> 
+                <span class="text-danger">[${message.fecha}]: </span> 
+                <i class="text-success"> ${message.text} </i>
+            </div>
             `).join(' ');
 
         document.getElementById('messages').innerHTML = messagesHtml;
@@ -114,17 +132,26 @@
         
         chat.addEventListener('submit', (event) => {
             event.preventDefault();
+            const mail = document.getElementById('email').value;
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const edad = document.getElementById('edad').value;
+            const alias = document.getElementById('alias').value;
+            const avatar = document.getElementById('avatar').value;
             const text = document.getElementById('message').value;
-            const author = document.getElementById('email').value;
             
             // Si mail está vacio muestra alerta
-            if(author ===""){
-                alert("Falta completar el email");
+            if(mail ==="" || nombre ==="" || apellido ==="" || edad ==="" || alias ==="" || avatar ===""){
+                alert("Falta completar campo");
             }else{
                 const date = new Date();
                 const fecha = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
             
-                message = {author, text, fecha};
+                author = { mail, nombre, apellido, edad, alias, avatar };
+                
+                const id = Math.max(messages.id)+1;
+
+                message = {id, author , text, fecha};
 
                 // Borrado de datos en el fomulario de chat
                 document.getElementById('message').value = "";
@@ -138,8 +165,11 @@
 
         const messagesHtml = messages.map ((message) => `
             <div>
-                <strong class="text-primary">${message.author}</strong> <span class="text-danger">[${message.fecha}]: </span> <i class="text-success"> ${message.text} </i>
-            <div>
+                <img width="50px" src=${message.author.avatar} alt=${message.author.alias}>
+                <strong class="text-primary">${message.author.mail}</strong> 
+                <span class="text-danger">[${message.fecha}]: </span> 
+                <i class="text-success"> ${message.text} </i>
+            </div>
             `).join(' ');
 
         document.getElementById('messages').innerHTML = messagesHtml;
