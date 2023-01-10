@@ -50,18 +50,22 @@ class messageContenedor{
             const print = (obj) => {
                 console.log(util.inspect(obj, false, 12, true).length);
             };
-
+            
+/*             
             console.log("Obj SIN normalizar");
             print (productos);
-
+            
             console.log("Obj normalizado");
-            const normalizedMessages = normalize(productos,messagesSchema);
             print (normalizedMessages);
-
+            
             console.log("Obj DESnomalizado");
-            print (denormalize(normalizedMessages.result, messagesSchema, normalizedMessages.entities));
+            print (denormalize(normalizedMessages.result, messagesSchema, normalizedMessages.entities)); 
+*/
+           
+            const normalizedMessages = normalize(productos,messagesSchema);
+            const compresion = ((1-(util.inspect(normalizedMessages, false, 12, true).length/util.inspect(productos, false, 12, true).length))*100).toFixed(2);
 
-       return productos;
+       return {mje:productos, compresion: compresion};
     }
 
 }

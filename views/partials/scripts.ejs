@@ -114,7 +114,7 @@
    }); */
    
     // Chat con mensajes previos
-    socket.on('conversation', (messages) => {
+    socket.on('conversation', (messages,compresion) => {
 
 
         const messagesHtml = messages.map ((message) => `
@@ -127,6 +127,7 @@
             `).join(' ');
 
         document.getElementById('messages').innerHTML = messagesHtml;
+        document.getElementById('compresion').innerHTML = `Compresión: % ${compresion}`;
         
         const chat = document.getElementById('chat');
         
@@ -161,7 +162,7 @@
         });
     });
     
-    socket.on('newConversation',(messages) =>{
+    socket.on('newConversation',(messages,compresion) =>{
 
         const messagesHtml = messages.map ((message) => `
             <div>

@@ -86,11 +86,11 @@ io.on('connection',(socket) => {
     const messageContenedor = require('./models/MessagesContenedor');
     const prueba = new messageContenedor ();
 
-    socket.emit('conversation',prueba.getAll().mensajes);
+    socket.emit('conversation',prueba.getAll().mje.mensajes,prueba.getAll().compresion);
     
     socket.on('new-message',(message) => {
         prueba.save(message);
-        io.sockets.emit('newConversation',prueba.getAll().mensajes);
+        io.sockets.emit('newConversation',prueba.getAll().mje.mensajes,prueba.getAll().compresion);
     });   
      
 });
